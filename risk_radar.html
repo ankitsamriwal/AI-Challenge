@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Risk Radar — AI Program Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0d12;
+    --surface: #111520;
+    --surface2: #161c2a;
+    --border: #1e2a3a;
+    --accent: #00d4ff;
+    --accent2: #ff4d6d;
+    --accent3: #ffd166;
+    --green: #06d6a0;
+    --text: #e8edf5;
+    --muted: #5a6a80;
+    --risk-critical: #ff4d6d;
+    --risk-high: #ff8c42;
+    --risk-medium: #ffd166;
+    --risk-low: #06d6a0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Pulse orb */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(0,212,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: orb 8s ease-in-out infinite alternate;
+  }
+
+  @keyframes orb {
+    from { transform: translate(0, 0) scale(1); }
+    to { transform: translate(-60px, 60px) scale(1.2); }
+  }
+
+  .wrapper { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 28px; }
+
+  /* Header */
+  header {
+    padding: 36px 0 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .radar-icon {
+    width: 42px;
+    height: 42px;
+    position: relative;
+  }
+
+  .radar-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1.5px solid var(--accent);
+    animation: ping 2s ease-out infinite;
+  }
+
+  .radar-ring:nth-child(1) { inset: 0; opacity: 0.8; animation-delay: 0s; }
+  .radar-ring:nth-child(2) { inset: 8px; opacity: 0.5; animation-delay: 0.4s; }
+  .radar-ring:nth-child(3) { inset: 16px; opacity: 0.3; animation-delay: 0.8s; }
+
+  .radar-dot {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 12px var(--accent);
+  }
+
+  @keyframes ping {
+    0% { transform: scale(1); opacity: inherit; }
+    70% { transform: scale(1.4); opacity: 0; }
+    100% { transform: scale(1); opacity: 0; }
+  }
+
+  .logo-text h1 {
+    font-family: 'Space Mono', monospace;
+    font-size: 20px;
+    color: var(--accent);
+    letter-spacing: 2px;
+  }
+
+  .logo-text p {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .header-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .live-dot {
+    width: 7px; height: 7px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--green);
+    animation: blink 1.5s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* Input section */
+  .input-section {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+    margin-bottom: 36px;
+  }
+
+  .input-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .card-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  textarea {
+    width: 100%;
+    height: 180px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 14px 16px;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  textarea:focus { border-color: rgba(0,212,255,0.4); }
+
+  textarea::placeholder { color: var(--muted); }
+
+  .sample-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 12px;
+  }
+
+  .sample-tag {
+    font-size: 11px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .sample-tag:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,212,255,0.06);
+  }
+
+  .config-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .config-row label {
+    font-size: 11px;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 8px;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .config-row input, .config-row select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .config-row input:focus, .config-row select:focus { border-color: rgba(0,212,255,0.4); }
+  .config-row select option { background: var(--surface2); }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .toggle {
+    width: 36px; height: 20px;
+    background: var(--border);
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .toggle.on { background: var(--accent); }
+
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    background: white;
+    border-radius: 50%;
+    top: 3px; left: 3px;
+    transition: transform 0.2s;
+  }
+
+  .toggle.on::after { transform: translateX(16px); }
+
+  .scan-btn {
+    width: 100%;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .scan-btn:hover:not(:disabled) {
+    background: #1ae8ff;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(0,212,255,0.3);
+  }
+
+  .scan-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(0,0,0,0.3);
+    border-top-color: var(--bg);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Results */
+  .results-section { display: none; }
+
+  .results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .results-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .scan-meta {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* Summary row */
+  .summary-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .stat-card.critical::before { background: var(--risk-critical); }
+  .stat-card.high::before { background: var(--risk-high); }
+  .stat-card.medium::before { background: var(--risk-medium); }
+  .stat-card.health::before { background: var(--green); }
+
+  .stat-label {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .stat-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .stat-card.critical .stat-value { color: var(--risk-critical); }
+  .stat-card.high .stat-value { color: var(--risk-high); }
+  .stat-card.medium .stat-value { color: var(--risk-medium); }
+  .stat-card.health .stat-value { color: var(--green); }
+
+  .stat-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* Risk cards grid */
+  .risks-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .risk-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeSlideUp 0.4s ease both;
+  }
+
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .risk-card::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+
+  .risk-card.CRITICAL::after { background: var(--risk-critical); }
+  .risk-card.HIGH::after { background: var(--risk-high); }
+  .risk-card.MEDIUM::after { background: var(--risk-medium); }
+  .risk-card.LOW::after { background: var(--risk-low); }
+
+  .risk-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    gap: 12px;
+  }
+
+  .risk-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    padding: 3px 9px;
+    border-radius: 3px;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .CRITICAL .risk-badge { background: rgba(255,77,109,0.15); color: var(--risk-critical); border: 1px solid rgba(255,77,109,0.3); }
+  .HIGH .risk-badge { background: rgba(255,140,66,0.15); color: var(--risk-high); border: 1px solid rgba(255,140,66,0.3); }
+  .MEDIUM .risk-badge { background: rgba(255,209,102,0.12); color: var(--risk-medium); border: 1px solid rgba(255,209,102,0.3); }
+  .LOW .risk-badge { background: rgba(6,214,160,0.1); color: var(--risk-low); border: 1px solid rgba(6,214,160,0.25); }
+
+  .risk-type-tag {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    background: var(--surface2);
+    padding: 3px 8px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+  }
+
+  .risk-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+
+  .risk-desc {
+    font-size: 13px;
+    color: #8a9ab5;
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+
+  .risk-meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .meta-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .meta-pill span:first-child {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #3a4a60;
+  }
+
+  .meta-pill span:last-child {
+    color: #9aadc0;
+  }
+
+  /* Action items */
+  .actions-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px 24px;
+    margin-bottom: 24px;
+  }
+
+  .actions-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .action-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    animation: fadeSlideUp 0.4s ease both;
+  }
+
+  .action-item:last-child { border-bottom: none; }
+
+  .action-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    min-width: 24px;
+    padding-top: 2px;
+  }
+
+  .action-text {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .action-owner {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    background: var(--surface2);
+    padding: 3px 9px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+    align-self: flex-start;
+    margin-top: 2px;
+  }
+
+  /* Programme health */
+  .health-bar-wrap {
+    margin-top: 8px;
+  }
+
+  .health-label-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .health-bar {
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .health-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--green), var(--accent));
+    transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* Streaming cursor */
+  .streaming-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 14px;
+    background: var(--accent);
+    margin-left: 2px;
+    animation: blink 0.8s steps(2) infinite;
+    vertical-align: middle;
+  }
+
+  /* Error state */
+  .error-banner {
+    background: rgba(255,77,109,0.08);
+    border: 1px solid rgba(255,77,109,0.3);
+    border-radius: 8px;
+    padding: 14px 18px;
+    color: var(--risk-critical);
+    font-size: 13px;
+    display: none;
+    margin-bottom: 16px;
+  }
+
+  /* Loading overlay for results */
+  .loading-state {
+    display: none;
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .loading-radar {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    position: relative;
+  }
+
+  .sweep {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    overflow: hidden;
+  }
+
+  .sweep::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: conic-gradient(from 0deg, transparent 60%, rgba(0,212,255,0.4) 100%);
+    animation: sweep 1.5s linear infinite;
+    border-radius: 50%;
+  }
+
+  @keyframes sweep { to { transform: rotate(360deg); } }
+
+  .sweep-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    transform: translate(-50%,-50%);
+    box-shadow: 0 0 10px var(--accent);
+  }
+
+  .loading-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  .loading-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  footer {
+    margin-top: 60px;
+    padding: 24px 0;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-left {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .footer-right {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .footer-right span {
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+  }
+
+  @media (max-width: 768px) {
+    .input-section { grid-template-columns: 1fr; }
+    .summary-row { grid-template-columns: repeat(2, 1fr); }
+    .risks-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <header>
+    <div class="logo">
+      <div class="radar-icon">
+        <div class="radar-ring"></div>
+        <div class="radar-ring"></div>
+        <div class="radar-ring"></div>
+        <div class="radar-dot"></div>
+      </div>
+      <div class="logo-text">
+        <h1>RISK RADAR</h1>
+        <p>AI Programme Intelligence · Careem Rides</p>
+      </div>
+    </div>
+    <div class="header-badge">
+      <div class="live-dot"></div>
+      LIVE AI ENGINE
+    </div>
+  </header>
+
+  <!-- Input -->
+  <div class="input-section">
+    <div class="input-card">
+      <div class="card-label">Programme Update Input</div>
+      <textarea id="updateInput" placeholder="Paste raw project updates, standup notes, Slack threads, status emails, or any unstructured programme text here...
+
+Example: 'Payment gateway team says Stripe integration needs 2 extra weeks. The auth module blocked on ops sign-off since Tuesday. Data migration still on track but infra team flagged capacity issues for Q3 launch. Third-party maps API rate limits hit in staging.'"></textarea>
+      <div class="sample-tags">
+        <span class="card-label" style="flex:none; margin:0; font-size:9px;">TRY SAMPLE:</span>
+        <span class="sample-tag" onclick="loadSample('rides')">🚗 Rides Launch</span>
+        <span class="sample-tag" onclick="loadSample('payments')">💳 Payments API</span>
+        <span class="sample-tag" onclick="loadSample('migration')">🔄 Data Migration</span>
+      </div>
+    </div>
+
+    <div class="config-card">
+      <div class="card-label">Scan Config</div>
+
+      <div class="config-row">
+        <label>Programme Context</label>
+        <select id="programmeType">
+          <option value="rides">Rides Vertical</option>
+          <option value="payments">Payments</option>
+          <option value="super-app">Super App Integration</option>
+          <option value="partner">Partner API Integration</option>
+          <option value="infra">Infrastructure</option>
+        </select>
+      </div>
+
+      <div class="config-row">
+        <label>Anthropic API Key</label>
+        <input type="password" id="apiKey" placeholder="sk-ant-..." />
+      </div>
+
+      <div class="toggle-row">
+        <span>Flag third-party dependencies</span>
+        <div class="toggle on" id="toggle3p" onclick="this.classList.toggle('on')"></div>
+      </div>
+
+      <div class="toggle-row">
+        <span>Suggest action owners</span>
+        <div class="toggle on" id="toggleOwners" onclick="this.classList.toggle('on')"></div>
+      </div>
+
+      <div class="toggle-row">
+        <span>Escalation recommendations</span>
+        <div class="toggle on" id="toggleEscalate" onclick="this.classList.toggle('on')"></div>
+      </div>
+
+      <button class="scan-btn" id="scanBtn" onclick="runScan()">
+        <div class="btn-spinner" id="spinner"></div>
+        <span id="btnText">⬡ RUN RISK SCAN</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="error-banner" id="errorBanner"></div>
+
+  <!-- Loading -->
+  <div class="loading-state" id="loadingState">
+    <div class="loading-radar">
+      <div class="sweep"></div>
+      <div class="sweep-center"></div>
+    </div>
+    <div class="loading-text">SCANNING FOR RISKS</div>
+    <div class="loading-sub">AI analysing dependencies, blockers, and velocity signals...</div>
+  </div>
+
+  <!-- Results -->
+  <div class="results-section" id="results">
+    <div class="results-header">
+      <div class="results-title">⬡ Scan Results</div>
+      <div class="scan-meta" id="scanMeta"></div>
+    </div>
+
+    <!-- Stats -->
+    <div class="summary-row">
+      <div class="stat-card critical">
+        <div class="stat-label">Critical</div>
+        <div class="stat-value" id="statCritical">0</div>
+        <div class="stat-sub">Immediate action</div>
+      </div>
+      <div class="stat-card high">
+        <div class="stat-label">High</div>
+        <div class="stat-value" id="statHigh">0</div>
+        <div class="stat-sub">Escalate soon</div>
+      </div>
+      <div class="stat-card medium">
+        <div class="stat-label">Medium</div>
+        <div class="stat-value" id="statMedium">0</div>
+        <div class="stat-sub">Monitor closely</div>
+      </div>
+      <div class="stat-card health">
+        <div class="stat-label">Programme Health</div>
+        <div class="stat-value" id="statHealth">—</div>
+        <div class="stat-sub" id="statHealthSub">Pending scan</div>
+      </div>
+    </div>
+
+    <!-- Health bar -->
+    <div class="health-bar-wrap" style="margin-bottom: 24px;">
+      <div class="health-label-row">
+        <span>DELIVERY CONFIDENCE</span>
+        <span id="healthPct">—</span>
+      </div>
+      <div class="health-bar">
+        <div class="health-fill" id="healthFill" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- Risk cards -->
+    <div class="risks-grid" id="risksGrid"></div>
+
+    <!-- Actions -->
+    <div class="actions-section" id="actionsSection">
+      <div class="actions-title">⬡ Recommended Actions</div>
+      <div id="actionsList"></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-left">RISK RADAR v1.0 · POWERED BY CLAUDE SONNET 4</div>
+    <div class="footer-right">Built for <span>Careem AI Challenge</span> · Ankit Samriwal</div>
+  </footer>
+</div>
+
+<script>
+const SAMPLES = {
+  rides: `Standup notes 3 June:
+- Captain app v4.2 release blocked — maps SDK still failing on low-end Android devices. Farhaan from mobile says fix needs 5 more days but release was supposed to go Friday.
+- Pricing engine team flagged: real-time surge config endpoint from third-party partner Luminate has been responding at 4–6s instead of <500ms SLA. Impacting staging tests.
+- Dispatch algorithm changes from ML team not reviewed yet — Reem said she needs data team sign-off first.
+- UAE Central Bank API cert renewal due 14 June — no ticket raised yet, no owner assigned.
+- Load test scheduled for 10 June still has no infra capacity confirmed from DevOps.
+- QA is short 2 engineers this week — one sick, one on leave. Only 40% coverage possible.
+- Rollback plan for v4.2 not documented. Hani flagged this twice in last sprint.`,
+
+  payments: `Payments team update — from Slack thread:
+Maha: "Stripe has changed their webhook signature validation format, need to update our listener before 20 June or all payment confirmations break"
+DevOps: still waiting for prod secrets rotation approval from InfoSec (submitted 2 weeks ago)
+Compliance review for new wallet topup feature: no date scheduled, compliance team says they need 3 weeks minimum once they start
+Data team flagged: transactions reporting dashboard showing 2.3% discrepancy vs source — investigation not started
+Captain payout batch job failed twice this week silently — alerting not configured on that service
+New payment gateway integration (Telr) docs received but no engineer assigned to read/implement
+Sprint velocity down 35% last 2 sprints, team raised concerns about tech debt in payment processing layer`,
+
+  migration: `Migration programme — weekly status pack notes:
+Legacy Oracle DB to Cloud SQL migration: currently at 60% data moved. ETL pipeline failing intermittently on large transaction tables (>50M rows). Cause unknown.
+Third-party vendor Synapse Data: not responding to emails for 6 days. They own the transformation scripts for financial reconciliation module.
+Target go-live: July 1st. No revised timeline despite known blockers. Engineering lead flagged timeline at risk but no exec decision made.
+PII data classification not completed — legal says we can't move customer records until done. Legal team capacity unknown.
+Disaster recovery runbook: draft shared 3 weeks ago, no review comments received. DR test not scheduled.
+New cloud environment provisioning: DevOps waiting on budget approval for 3 weeks — escalation not done.
+Stakeholder comms plan: last update sent was 6 weeks ago. Several business units unaware of cutover date.`
+};
+
+function loadSample(type) {
+  document.getElementById('updateInput').value = SAMPLES[type];
+}
+
+function buildPrompt(updateText, config) {
+  return `You are an expert Program Manager AI for a fast-paced tech company (like Careem). Analyse the following programme update and extract all risks, blockers, and dependencies.
+
+Programme Context: ${config.programmeType} vertical
+Third-party dependency flagging: ${config.flag3p ? 'ENABLED' : 'disabled'}
+Action owner suggestions: ${config.suggestOwners ? 'ENABLED' : 'disabled'}
+Escalation recommendations: ${config.escalate ? 'ENABLED' : 'disabled'}
+
+PROGRAMME UPDATE:
+${updateText}
+
+Respond ONLY with a valid JSON object — no markdown, no preamble, no explanation. Use this exact schema:
+
+{
+  "programme_health": {
+    "score": <integer 0-100>,
+    "label": "<RED|AMBER|GREEN>",
+    "confidence_pct": <integer 0-100>,
+    "summary": "<one sentence overall health assessment>"
+  },
+  "risks": [
+    {
+      "id": "R01",
+      "title": "<short risk title, max 8 words>",
+      "severity": "<CRITICAL|HIGH|MEDIUM|LOW>",
+      "type": "<BLOCKER|DEPENDENCY|TIMELINE|RESOURCE|COMPLIANCE|TECHNICAL|THIRD-PARTY>",
+      "description": "<clear 1–2 sentence description of the risk and its impact>",
+      "impact": "<what breaks if unresolved>",
+      "owner": "<suggested owner role or person if mentioned, else 'Unassigned'>",
+      "deadline": "<specific date or 'Immediate' or 'This sprint' or 'TBD'>"
+    }
+  ],
+  "actions": [
+    {
+      "priority": <1-based integer>,
+      "action": "<clear actionable instruction>",
+      "owner": "<suggested owner>",
+      "due": "<timeframe>"
+    }
+  ]
+}
+
+Rules:
+- Extract ALL risks visible in the text, even implied ones
+- CRITICAL = programme-stopping or legal/compliance breach imminent
+- HIGH = will cause delay or quality failure if not resolved this week
+- MEDIUM = needs tracking, risk of becoming HIGH
+- LOW = monitor only
+- Be specific — use names, dates, system names from the update
+- Actions must be concrete and executable, not vague
+- Maximum 8 risks, maximum 6 actions
+- Return ONLY the JSON, nothing else`;
+}
+
+async function runScan() {
+  const updateText = document.getElementById('updateInput').value.trim();
+  const apiKey = document.getElementById('apiKey').value.trim();
+
+  if (!updateText) {
+    showError('Please paste a programme update to analyse.');
+    return;
+  }
+  if (!apiKey || !apiKey.startsWith('sk-ant-')) {
+    showError('Please enter a valid Anthropic API key (starts with sk-ant-).');
+    return;
+  }
+
+  hideError();
+  setLoading(true);
+
+  const config = {
+    programmeType: document.getElementById('programmeType').value,
+    flag3p: document.getElementById('toggle3p').classList.contains('on'),
+    suggestOwners: document.getElementById('toggleOwners').classList.contains('on'),
+    escalate: document.getElementById('toggleEscalate').classList.contains('on')
+  };
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        messages: [{ role: 'user', content: buildPrompt(updateText, config) }]
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error?.message || `API error ${response.status}`);
+    }
+
+    const data = await response.json();
+    const raw = data.content[0].text.trim();
+
+    let parsed;
+    try {
+      const clean = raw.replace(/^```json\s*/,'').replace(/```\s*$/,'');
+      parsed = JSON.parse(clean);
+    } catch(e) {
+      throw new Error('AI returned unexpected format. Please retry.');
+    }
+
+    renderResults(parsed);
+
+  } catch (err) {
+    showError('Scan failed: ' + err.message);
+  } finally {
+    setLoading(false);
+  }
+}
+
+function renderResults(data) {
+  const risks = data.risks || [];
+  const actions = data.actions || [];
+  const health = data.programme_health || {};
+
+  // Stats
+  const critical = risks.filter(r => r.severity === 'CRITICAL').length;
+  const high = risks.filter(r => r.severity === 'HIGH').length;
+  const medium = risks.filter(r => r.severity === 'MEDIUM').length;
+
+  document.getElementById('statCritical').textContent = critical;
+  document.getElementById('statHigh').textContent = high;
+  document.getElementById('statMedium').textContent = medium;
+
+  const healthLabel = health.label || 'AMBER';
+  const healthScore = health.score || 50;
+  const healthPct = health.confidence_pct || 50;
+
+  document.getElementById('statHealth').textContent = healthLabel;
+  document.getElementById('statHealthSub').textContent = health.summary || '';
+  document.getElementById('healthPct').textContent = healthPct + '%';
+
+  const colorMap = { GREEN: 'var(--green)', AMBER: 'var(--risk-medium)', RED: 'var(--risk-critical)' };
+  document.getElementById('statHealth').style.color = colorMap[healthLabel] || 'var(--risk-medium)';
+
+  setTimeout(() => {
+    document.getElementById('healthFill').style.width = healthPct + '%';
+  }, 100);
+
+  // Scan meta
+  document.getElementById('scanMeta').textContent =
+    new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}) +
+    ' · ' + risks.length + ' risks detected';
+
+  // Risk cards
+  const grid = document.getElementById('risksGrid');
+  grid.innerHTML = '';
+
+  risks.forEach((risk, i) => {
+    const card = document.createElement('div');
+    card.className = `risk-card ${risk.severity}`;
+    card.style.animationDelay = `${i * 0.08}s`;
+    card.innerHTML = `
+      <div class="risk-top">
+        <div style="flex:1">
+          <span class="risk-type-tag">${risk.type || 'RISK'}</span>
+        </div>
+        <span class="risk-badge">${risk.severity}</span>
+      </div>
+      <div class="risk-title">${escHtml(risk.title)}</div>
+      <div class="risk-desc">${escHtml(risk.description)}</div>
+      <div class="risk-meta">
+        <div class="meta-pill">
+          <span>IMPACT</span>
+          <span>${escHtml(risk.impact || '—')}</span>
+        </div>
+        <div class="meta-pill">
+          <span>OWNER</span>
+          <span>${escHtml(risk.owner || 'Unassigned')}</span>
+        </div>
+        <div class="meta-pill">
+          <span>BY</span>
+          <span>${escHtml(risk.deadline || 'TBD')}</span>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  // Actions
+  const actionsList = document.getElementById('actionsList');
+  actionsList.innerHTML = '';
+
+  actions.forEach((a, i) => {
+    const item = document.createElement('div');
+    item.className = 'action-item';
+    item.style.animationDelay = `${i * 0.07}s`;
+    item.innerHTML = `
+      <div class="action-num">${String(a.priority || i+1).padStart(2,'0')}</div>
+      <div class="action-text">
+        ${escHtml(a.action)}
+        <div style="font-size:11px; color:var(--muted); margin-top:4px;">Due: ${escHtml(a.due || 'ASAP')}</div>
+      </div>
+      <div class="action-owner">${escHtml(a.owner || '?')}</div>`;
+    actionsList.appendChild(item);
+  });
+
+  // Show results
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function setLoading(on) {
+  const btn = document.getElementById('scanBtn');
+  const spinner = document.getElementById('spinner');
+  const btnText = document.getElementById('btnText');
+  const loading = document.getElementById('loadingState');
+
+  btn.disabled = on;
+  spinner.style.display = on ? 'block' : 'none';
+  btnText.textContent = on ? 'SCANNING...' : '⬡ RUN RISK SCAN';
+  loading.style.display = on ? 'block' : 'none';
+
+  if (on) document.getElementById('results').style.display = 'none';
+}
+
+function showError(msg) {
+  const banner = document.getElementById('errorBanner');
+  banner.textContent = '⚠ ' + msg;
+  banner.style.display = 'block';
+}
+
+function hideError() {
+  document.getElementById('errorBanner').style.display = 'none';
+}
+</script>
+</body>
+</html>
